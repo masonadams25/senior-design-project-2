@@ -1,7 +1,16 @@
 from machine import Pin, UART, I2C, SPI, sdcard
+from time import sleep
 import os 
 
+from data.py import data_struct
+
+# micropython libraries: https://docs.micropython.org/en/latest/library/index.html
+
 ### pin/port initialization ###
+
+data = data_struct
+
+led = Pin("LED", Pin.OUT)
 
 gps_scl_pin = 25 #integar value specifying pico pin
 gps_sda_pin = 24
@@ -58,8 +67,25 @@ def sd_write(data):
 def sd_read():
     with open("/sd/data.txt", "r") as file:
         return file.read()
+    
+### misc functions ###
+
+start = False
+
+def gui_interupt():
+    start = not start
         
+### main ###
+
+# calls gui_interupt when it recieves data
+gui_uart.irq(gui_uart.RX_ANY, priority = 1, handler = gui_interupt, wake = machine.IDLE) 
 
 
+while start == False: # blink LED when waiting to start
+    led.value(1)
+    sleep(0.5)
+    led.value(0)
 
+while start == True:
+    led.value(1)
 
