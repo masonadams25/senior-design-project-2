@@ -1,10 +1,13 @@
 from machine import Pin, UART, I2C, SPI, sdcard
+from micropyGPS import MicropyGPS
 from time import sleep
 import os 
 
 from data import data_struct
 
 # micropython libraries: https://docs.micropython.org/en/latest/library/index.html
+
+# gps library: https://github.com/inmcm/micropyGPS
 
 ### pin/port initialization ###
 
@@ -15,6 +18,8 @@ led = Pin("LED", Pin.OUT)
 gps_scl_pin = 25 #integar value specifying pico pin
 gps_sda_pin = 24
 gps_i2c = I2C(0, scl = Pin(gps_scl_pin), sda = Pin(gps_sda_pin)) # set up gps i2c on bus 0
+
+gps = MicropyGPS()
 
 imu_scl_pin = 27 #integar value specifying pico pin
 imu_sda_pin = 26
@@ -68,9 +73,15 @@ def sd_read():
     with open("/sd/data.txt", "r") as file:
         return file.read()
     
+def gps_update(): # adds characters to microGPS parser, can be access by gps.lattitude, gps.longitude, etc
+    gps_data = i2c_read(gps_i2c, 64)
+    for x in gps_data:
+        gps.update(x)
+    
 ### misc functions ###
 
 start = False
+testing = True
 
 def gui_interupt():
     start = not start
@@ -80,14 +91,18 @@ def gui_interupt():
 # calls gui_interupt when it recieves data
 gui_uart.irq(gui_uart.RX_ANY, priority = 1, handler = gui_interupt, wake = machine.IDLE) 
 
-
 while start == False: # blink LED when waiting to start
     led.value(1)
     sleep(0.5)
     led.value(0)
 
+gps_data = ''
+imu_data = ''
 while start == True:
     uart_write(radio_uart, b'TEST\n\r')
     sleep(1)
     led.value(1)
-
+    
+    while testing == True:
+        gps_update()
+        imu_data = i2c_read(imu_i2c, 64)

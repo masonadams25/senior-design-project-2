@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+import serial
 
 from data import data_struct
 
@@ -16,7 +17,7 @@ root.rowconfigure(0, weight=1)
 font = ("TkDefaultFont", 24, "bold")
 padding = 10
 
-# GPS #
+## GPS ##
 
 lat_label = ttk.Label(mainframe, font = font, padding = padding, text='Lattitude')
 lat_label.grid(column=0, row=0)
@@ -30,9 +31,9 @@ elev_label.grid(column=2, row=0)
 num_sat_label = ttk.Label(mainframe, font = font, padding = padding, text='Num satellites')
 num_sat_label.grid(column=3, row=0)
 
-# IMU #
+## IMU ##
 
-# Vel #
+# vel #
 
 vel_x_label = ttk.Label(mainframe, font = font, padding = padding, text='Velocity: X')
 vel_x_label.grid(column=0, row=2)
@@ -43,7 +44,7 @@ vel_y_label.grid(column=1, row=2)
 vel_z_label = ttk.Label(mainframe, font = font, padding = padding, text='Velocity: Z')
 vel_z_label.grid(column=2, row=2)
 
-# Acc #
+# acc #
 
 acc_x_label = ttk.Label(mainframe, font = font, padding = padding, text='Acceleration: X')
 acc_x_label.grid(column=0, row=4)
@@ -54,7 +55,7 @@ acc_y_label.grid(column=1, row=4)
 acc_z_label = ttk.Label(mainframe, font = font, padding = padding, text='Acceleration: Z')
 acc_z_label.grid(column=2, row=4)
 
-# Mag #
+# mag #
 
 mag_x_label = ttk.Label(mainframe, font = font, padding = padding, text='Mag field: X')
 mag_x_label.grid(column=0, row=6)
@@ -72,7 +73,7 @@ data = data_struct
 font = ("TkDefaultFont", 14)
 padding = 0
 
-# GPS #
+## GPS ##
 
 lat_data = ttk.Label(mainframe, font = font, padding = padding, text = data["GPS"]["lattitude"])
 lat_data.grid(column=0, row=1)
@@ -86,9 +87,9 @@ elev_data.grid(column=2, row=1)
 num_sat_data = ttk.Label(mainframe, font = font, padding = padding, text = data["GPS"]["num_satellites"])
 num_sat_data.grid(column=3, row=1)
 
-# IMU #
+## IMU ##
 
-# Vel #
+# vel #
 
 vel_x_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["velocity"]["x"])
 vel_x_data.grid(column=0, row=3)
@@ -99,7 +100,7 @@ vel_y_data.grid(column=1, row=3)
 vel_z_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["velocity"]["z"])
 vel_z_data.grid(column=2, row=3)
 
-# Acc #
+# acc #
 
 acc_x_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["acceleration"]["x"])
 acc_x_data.grid(column=0, row=5)
@@ -110,7 +111,7 @@ acc_y_data.grid(column=1, row=5)
 acc_z_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["acceleration"]["x"])
 acc_z_data.grid(column=2, row=5)
 
-# Mag #
+# mag #
 
 mag_x_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["mag_field"]["x"])
 mag_x_data.grid(column=0, row=7)
@@ -121,11 +122,11 @@ mag_y_data.grid(column=1, row=7)
 mag_z_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["mag_field"]["z"])
 mag_z_data.grid(column=2, row=7)
 
-### Buttons ###
+### buttons ###
 
 running = False
 status = StringVar()
-status.set("Paused")
+status.set("Press start")
 
 status_label = ttk.Label(mainframe, font = ("TkDefaultFont", 24, "bold"), padding = 10, text='Status')
 status_label.grid(column=3, row=6)
@@ -133,20 +134,34 @@ status_label.grid(column=3, row=6)
 status_data = ttk.Label(mainframe, font = font, padding = padding, textvariable = status)
 status_data.grid(column=3, row=7)
 
-
 def start():
     running = True
     status.set("Running")
+    serial_write(b'doesnt matter')
 
 def stop():
     running = False
     status.set("Paused")
+    serial_write(b'doesnt matter')
 
 start = ttk.Button(mainframe, text='Start', command = start)
 start.grid(column=3, row=2)
 
 stop = ttk.Button(mainframe, text='Stop', command = stop)
 stop.grid(column=3, row=4)
+
+### I/O with pico ###
+
+serial_port = "/dev/cu.usbmodemXXXX"
+pico_serial = serial.Serial(serial_port)
+
+def serial_read():
+    return pico_serial.read()
+
+def serial_write(data):
+    pico_serial.write(data)
+
+### main ###
 
 while running:
     pass
