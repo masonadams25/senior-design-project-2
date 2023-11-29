@@ -1,18 +1,26 @@
 data_struct = {
     "test" : "test",
     "GPS" : {
-        "lattitude" : '',
-        "longtiude" : '',
-        "elevation" : '',
-        "num_sattelites" : ''
+        "lattitude" : 'NA',
+        "longtiude" : 'NA',
+        "elevation" : 'NA',
+        "num_satellites" : 'NA'
     },
     "IMU" : {
         "velocity" : {
-            "x" : '',
-            "y" : '',
-            "x" : ''
+            "x" : 'NA',
+            "y" : 'NA',
+            "z" : 'NA'
         },
-        "acceleration" : '',
-        "mag_field" : ''
+        "acceleration" : {
+            "x" : 'NA',
+            "y" : 'NA',
+            "z" : 'NA'
+        },
+        "mag_field" : {
+            "x" : 'NA',
+            "y" : 'NA',
+            "z" : 'NA'
+        }
     }
 }

@@ -2,7 +2,7 @@ from machine import Pin, UART, I2C, SPI, sdcard
 from time import sleep
 import os 
 
-from data.py import data_struct
+from data import data_struct
 
 # micropython libraries: https://docs.micropython.org/en/latest/library/index.html
 
@@ -87,5 +87,7 @@ while start == False: # blink LED when waiting to start
     led.value(0)
 
 while start == True:
+    uart_write(radio_uart, b'TEST\n\r')
+    sleep(1)
     led.value(1)
 
