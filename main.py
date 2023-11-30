@@ -124,3 +124,5 @@ while start == True:
         data["IMU"]["acceleration"] = "X: %.2f, Y: %.2f, Z: %.2f" % (imu_i2c.acceleration)
         data["IMU"]["mag_field"] = "X: %.2f, Y: %.2f, Z: %.2f" % (imu_i2c.magnetic)
 
+        ## Send and read data ##
+
