@@ -105,4 +105,10 @@ while start == True:
     
     while testing == True:
         gps_update()
+
+        data['GPS']['lattitude'] = gps.lattitude
+        data['GPS']['longtiude'] = gps.longtiude
+        data['GPS']['elevation'] = gps.altitude
+        data['GPS']['num_satellites'] = gps.satellites_in_use
+
         imu_data = i2c_read(imu_i2c, 64)
