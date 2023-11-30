@@ -4,6 +4,7 @@ from time import sleep
 import os 
 
 from adafruit_platformdetect import board
+import busio
 import adafruit_icm20x
 
 from data import data_struct
@@ -30,7 +31,7 @@ gps = MicropyGPS()
 # imu_i2c = I2C(1, scl = Pin(imu_scl_pin), sda = Pin(imu_sda_pin))  # set up imu i2c on bus 1
 
 # circuit python imu
-i2c = board.I2C()   # uses board.SCL and board.SDA
+i2c = busio.I2C(scl=board.GP21, sda=board.GP20)   # instantiate i2c for imu, scl 27 = gp21, sda 26 = gp20
 imu_i2c = adafruit_icm20x.ICM20649(i2c)
 
 # check hco6 guide on canvas to get this working
@@ -127,11 +128,12 @@ while start == True:
         ## Send and read data ##
 
         uart_write(gui_uart, b'START') # command to start sending
+        sleep_us(10)
 
         uart_write(gui_uart, "%s - %s - %s - %s" % (data['GPS']['lattitude'], data['GPS']['longtiude'], data['GPS']['elevation'], data['GPS']['num_satellites']) )
-        sleep_us(5) # 5 micro seconds
+        sleep_us(10) # 10 micro seconds
 
         uart_write(gui_uart, "%s - %s - %s" % (data["IMU"]["velocity"], data["IMU"]["acceleration"], data["IMU"]["mag_field"]))
-        sleep_us(5)
+        sleep_us(10)
 
         print("Data collected and sent")
