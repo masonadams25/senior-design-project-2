@@ -137,12 +137,12 @@ status_data.grid(column=3, row=7)
 def start():
     running = True
     status.set("Running")
-    serial_write(b'doesnt matter')
+    # serial_write(b'doesnt matter')
 
 def stop():
     running = False
     status.set("Paused")
-    serial_write(b'doesnt matter')
+    # serial_write(b'doesnt matter')
 
 start = ttk.Button(mainframe, text='Start', command = start)
 start.grid(column=3, row=2)
@@ -153,7 +153,7 @@ stop.grid(column=3, row=4)
 ### I/O with pico ###
 
 serial_port = "/dev/cu.usbmodemXXXX"
-pico_serial = serial.Serial(serial_port)
+# pico_serial = serial.Serial(serial_port)
 
 def serial_read():
     return pico_serial.read()

@@ -3,6 +3,9 @@ from micropyGPS import MicropyGPS
 from time import sleep
 import os 
 
+from adafruit_platformdetect import board
+import adafruit_icm20x
+
 from data import data_struct
 
 # micropython libraries: https://docs.micropython.org/en/latest/library/index.html
@@ -21,9 +24,14 @@ gps_i2c = I2C(0, scl = Pin(gps_scl_pin), sda = Pin(gps_sda_pin)) # set up gps i2
 
 gps = MicropyGPS()
 
-imu_scl_pin = 27 #integar value specifying pico pin
-imu_sda_pin = 26
-imu_i2c = I2C(1, scl = Pin(imu_scl_pin), sda = Pin(imu_sda_pin))  # set up imu i2c on bus 1
+# Original imu in case circuitpython does not work
+# imu_scl_pin = 27 #integar value specifying pico pin
+# imu_sda_pin = 26
+# imu_i2c = I2C(1, scl = Pin(imu_scl_pin), sda = Pin(imu_sda_pin))  # set up imu i2c on bus 1
+
+# circuit python imu
+i2c = board.I2C()   # uses board.SCL and board.SDA
+imu_i2c = adafruit_icm20x.ICM20649(i2c)
 
 # check hco6 guide on canvas to get this working
 # byte stuff is 8N1
@@ -104,6 +112,7 @@ while start == True:
     led.value(1)
     
     while testing == True:
+        ## Read and update data ##
         gps_update()
 
         data['GPS']['lattitude'] = gps.lattitude
@@ -111,4 +120,7 @@ while start == True:
         data['GPS']['elevation'] = gps.altitude
         data['GPS']['num_satellites'] = gps.satellites_in_use
 
-        imu_data = i2c_read(imu_i2c, 64)
+        data["IMU"]["velocity"] = "X: %.2f, Y: %.2f, Z: %.2f" % (imu_i2c.gyro)
+        data["IMU"]["acceleration"] = "X: %.2f, Y: %.2f, Z: %.2f" % (imu_i2c.acceleration)
+        data["IMU"]["mag_field"] = "X: %.2f, Y: %.2f, Z: %.2f" % (imu_i2c.magnetic)
+
