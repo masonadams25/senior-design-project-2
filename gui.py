@@ -91,35 +91,35 @@ num_sat_data.grid(column=3, row=1)
 
 # vel #
 
-vel_x_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["velocity"]["x"])
+vel_x_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["velocity"])
 vel_x_data.grid(column=0, row=3)
 
-vel_y_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["velocity"]["y"])
+vel_y_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["velocity"])
 vel_y_data.grid(column=1, row=3)
 
-vel_z_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["velocity"]["z"])
+vel_z_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["velocity"])
 vel_z_data.grid(column=2, row=3)
 
 # acc #
 
-acc_x_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["acceleration"]["x"])
+acc_x_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["acceleration"])
 acc_x_data.grid(column=0, row=5)
 
-acc_y_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["acceleration"]["y"])
+acc_y_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["acceleration"])
 acc_y_data.grid(column=1, row=5)
 
-acc_z_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["acceleration"]["x"])
+acc_z_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["acceleration"])
 acc_z_data.grid(column=2, row=5)
 
 # mag #
 
-mag_x_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["mag_field"]["x"])
+mag_x_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["mag_field"])
 mag_x_data.grid(column=0, row=7)
 
-mag_y_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["mag_field"]["y"])
+mag_y_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["mag_field"])
 mag_y_data.grid(column=1, row=7)
 
-mag_z_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["mag_field"]["z"])
+mag_z_data = ttk.Label(mainframe, font = font, padding = padding, text = data["IMU"]["mag_field"])
 mag_z_data.grid(column=2, row=7)
 
 ### buttons ###
@@ -163,6 +163,8 @@ def serial_write(data):
 
 ### main ###
 
+gps_data = ''
+imu_data = ''
 while running:
     pass
 

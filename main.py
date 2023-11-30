@@ -126,3 +126,12 @@ while start == True:
 
         ## Send and read data ##
 
+        uart_write(gui_uart, b'START') # command to start sending
+
+        uart_write(gui_uart, "%s - %s - %s - %s" % (data['GPS']['lattitude'], data['GPS']['longtiude'], data['GPS']['elevation'], data['GPS']['num_satellites']) )
+        sleep_us(5) # 5 micro seconds
+
+        uart_write(gui_uart, "%s - %s - %s" % (data["IMU"]["velocity"], data["IMU"]["acceleration"], data["IMU"]["mag_field"]))
+        sleep_us(5)
+
+        print("Data collected and sent")
