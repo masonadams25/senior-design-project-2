@@ -7,8 +7,20 @@ data_struct = {
         "num_satellites" : 'NA'
     },
     "IMU" : {
-        "velocity" : 'NA',
-        "acceleration" : 'NA',
-        "mag_field" : 'NA',
+        "velocity" : {
+            'x': 'NA',
+            'y': 'NA',
+            'z': 'NA',
+        },
+        "acceleration" : {
+            'x': 'NA',
+            'y': 'NA',
+            'z': 'NA',
+        },
+        "mag_field" : {
+            'x': 'NA',
+            'y': 'NA',
+            'z': 'NA',
+        }
     }
 }
