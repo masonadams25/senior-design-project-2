@@ -52,7 +52,7 @@ radio_uart = busio.UART(tx = board.GP0, rx = board.GP1, baudrate = 9600)
 gui_rx_pin = "GP5"
 gui_tx_pin = "GP4"
 gui_baud_rate = 9600 # default?
-gui_uart = busio.UART(tx = board.GP4, rx = board.GP5, baudrate = 9600)
+gui_uart = busio.UART(tx = board.GP4, rx = board.GP5, baudrate = 9600, timeout = 0.1)
 
 sd_mosi_pin = "GP11"
 sd_miso_pin = "GP12"
@@ -75,11 +75,22 @@ def uart_read(port, num_bytes):
     data_string = ''.join([chr(b) for b in data])
     return data_string
 
+def gui_uart_read(port, num_bytes, state):
+    data = port.read(num_bytes) # returned as byte array
+    if data != None:
+        data_string = ''.join([chr(b) for b in data])
+        if data_string == "start":
+            return True
+        if data_string == "stop":
+            return False
+    
+    return state
+
 def i2c_read(port):
     port.try_lock() # need to lock i2c before scanning
     add = hex((port.scan())[0]) # get first address from i2c port
     port.unlock()
-    
+
     i2c.readfrom_into(0x18, data)
     data_string = ''.join([chr(b) for b in data])
     return data_string
@@ -87,34 +98,38 @@ def i2c_read(port):
 def sd_write(data):
     with open("/sd/data.txt", "w") as f:
         f.write(data)
-    
-    
-### MAIN ###  
-    
-start = True
+
+
+### MAIN ###
+
+start = False
 
 while True:
     while not start:
         led.value = True
-        time.sleep(0.5)
+        if gui_uart_read(gui_uart, 8, start):
+            start = True
+        time.sleep(0.2)
         led.value = False
-        time.sleep(0.5)
-        
+        if gui_uart_read(gui_uart, 8, start):
+            start = True
+        time.sleep(0.2)
+
     while start:
         led.value = True
-        
+
         # gps data
         gps.update()
         data["GPS"]["lattitude"] = str(gps.latitude)
         data["GPS"]["longtiude"] = str(gps.longitude)
         data["GPS"]["elevation"] = str(gps.altitude_m)
         data["GPS"]["num_satellites"] = str(gps.satellites)
-        
+
         # imu data
-        data["IMU"]["velocity"] = "%.2f - %.2f - %.2f" % imu.gyro
-        data["IMU"]["acceleration"] = "%.2f - %.2f - %.2f" % imu.acceleration
-        data["IMU"]["mag_field"] = "%.2f - %.2f - %.2f" % imu.magnetic
-        
+        data["IMU"]["velocity"] = "%.2f + %.2f + %.2f" % imu.gyro
+        data["IMU"]["acceleration"] = "%.2f + %.2f + %.2f" % imu.acceleration
+        data["IMU"]["mag_field"] = "%.2f + %.2f + %.2f" % imu.magnetic
+
         # "-" used as delimeter for parsing
         data_line = " %s + %s + %s + %s + %s + %s + %s " % (data["GPS"]["lattitude"], data["GPS"]["longtiude"],
                                                            data["GPS"]["elevation"], data["GPS"]["num_satellites"],
@@ -123,11 +138,15 @@ while True:
         print(data_line)
         # write to SD
         #sd_write(data_line)
-        
+
         # write to radio
         uart_write(radio_uart, data_line)
-        
+
         # write to gui
         uart_write(gui_uart, data_line)
         
+        if not gui_uart_read(gui_uart, 8, start):
+            start = False
+
         time.sleep(0.1)
+

@@ -5,6 +5,8 @@ import re
 
 from data import data_struct
 
+running = False
+
 root = Tk() # create main root for gui
 root.title("Project 2 GUI")
 
@@ -141,7 +143,6 @@ mag_z_data.grid(column=2, row=7)
 
 ### buttons ###
 
-running = False
 status = StringVar()
 status.set("Press start")
 
@@ -154,12 +155,12 @@ status_data.grid(column=3, row=7)
 def start():
     running = True
     status.set("Running")
-    # serial_write(b'doesnt matter')
+    serial_write(b'start')
 
 def stop():
     running = False
     status.set("Paused")
-    # serial_write(b'doesnt matter')
+    serial_write(b'stop')
 
 start = ttk.Button(mainframe, text='Start', command = start)
 start.grid(column=3, row=2)
@@ -169,11 +170,11 @@ stop.grid(column=3, row=4)
 
 ### I/O with pico ###
 
-serial_port = "/dev/cu.usbmodem1101"
-pico_serial = serial.Serial(serial_port, timeout=0.2)
+serial_port = "/dev/cu.usbmodem2102"
+pico_serial = serial.Serial(serial_port, timeout=0.5)
 
 def serial_read():
-    data = pico_serial.read()
+    data = pico_serial.read_until()
     data_string = ''.join([chr(b) for b in data])
     return data_string
 
@@ -183,29 +184,55 @@ def serial_write(data):
 ### main ###
 
 while True:
-    root.update()
-    usb_data = serial_read()
-    root.update()
-    usb_data = " 1 - 2 - 3 - 4 - a1 - a2 - a3 - b1 - b2 - b3 - c1 - c2 - c3 -"
-    regex = re.findall(" (.*?) -", usb_data)
+    while status.get() == "Running":
+        root.update()
+        usb_data = serial_read()
+        print(str(usb_data) + "\n\n" )
+        root.update()
+        #usb_data = " 1 - 2 - 3 - 4 - a1 - a2 - a3 - b1 - b2 - b3 - c1 - c2 - c3 -"
+        regex = re.findall("(.*?) \+", usb_data)
 
-    data["GPS"]["lattitude"].set(regex[0])
-    data["GPS"]["longtiude"].set(regex[1])
-    data["GPS"]["elevation"].set(regex[2])
-    data["GPS"]["num_satellites"].set(regex[3])
-    root.update()
+        try:
+            data["GPS"]["lattitude"].set(regex[0])
+            data["GPS"]["longtiude"].set(regex[1])
+            data["GPS"]["elevation"].set(regex[2])
+            data["GPS"]["num_satellites"].set(regex[3])
+            root.update()
 
-    # imu data
-    data["IMU"]["velocity"]['x'].set(regex[4])
-    data["IMU"]["velocity"]['y'].set(regex[5])
-    data["IMU"]["velocity"]['z'].set(regex[6])
-    data["IMU"]["acceleration"]['x'].set(regex[7])
-    data["IMU"]["acceleration"]['y'].set(regex[8])
-    data["IMU"]["acceleration"]['z'].set(regex[9])
-    data["IMU"]["mag_field"]['x'].set(regex[10])
-    data["IMU"]["mag_field"]['y'].set(regex[11])
-    data["IMU"]["mag_field"]['z'].set(regex[12])
-    print('loop')
+            # imu data
+            data["IMU"]["velocity"]['x'].set(regex[4])
+            data["IMU"]["velocity"]['y'].set(regex[5])
+            data["IMU"]["velocity"]['z'].set(regex[6])
+            data["IMU"]["acceleration"]['x'].set(regex[7])
+            data["IMU"]["acceleration"]['y'].set(regex[8])
+            data["IMU"]["acceleration"]['z'].set(regex[9])
+            data["IMU"]["mag_field"]['x'].set(regex[10])
+            data["IMU"]["mag_field"]['y'].set(regex[11])
+            data["IMU"]["mag_field"]['z'].set(regex[12][:6])
+        except:
+            pass
+        #print('loop')
 
-    root.update()
+        root.update_idletasks()
+        root.update()
 
+    while status.get() != "Running":
+        pico_serial.reset_input_buffer()
+        data["GPS"]["lattitude"].set("PAUSED")
+        data["GPS"]["longtiude"].set("PAUSED")
+        data["GPS"]["elevation"].set("PAUSED")
+        data["GPS"]["num_satellites"].set("PAUSED")
+        root.update()
+
+        # imu data
+        data["IMU"]["velocity"]['x'].set("PAUSED")
+        data["IMU"]["velocity"]['y'].set("PAUSED")
+        data["IMU"]["velocity"]['z'].set("PAUSED")
+        data["IMU"]["acceleration"]['x'].set("PAUSED")
+        data["IMU"]["acceleration"]['y'].set("PAUSED")
+        data["IMU"]["acceleration"]['z'].set("PAUSED")
+        data["IMU"]["mag_field"]['x'].set("PAUSED")
+        data["IMU"]["mag_field"]['y'].set("PAUSED")
+        data["IMU"]["mag_field"]['z'].set("PAUSED")
+        root.update_idletasks()
+        root.update()
